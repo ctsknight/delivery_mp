@@ -10,9 +10,6 @@ from odoo.tools.safe_eval import const_eval
 
 import logging
 
-import json
-import requests
-
 
 class Providermp(models.Model):
     _inherit = 'delivery.carrier'
@@ -92,12 +89,14 @@ class Providermp(models.Model):
         mp_provider = MPProvider(logging.getLogger(__name__), self.sudo().mp_username, self.sudo().mp_password)
         res = []
         for picking in pickings:
+            lognote_pickings = picking.sale_id.picking_ids if picking.sale_id else picking
+
             response = mp_provider.call_shipping_remote({
                 'action': 'shipment',
                 'package_type': self.mp_default_package_type_id.shipper_package_code,
                 'consignee': mp_provider._set_consignee(picking.partner_id),
                 'consignor': mp_provider._set_shipper(picking.company_id.partner_id,
-                                                                   picking.picking_type_id.warehouse_id.partner_id),
+                                                      picking.picking_type_id.warehouse_id.partner_id),
                 'reference_no': picking.sale_id.name if picking.sale_id else picking.name,
                 'details': mp_provider._set_shipment_details(picking)
             })
@@ -106,6 +105,12 @@ class Providermp(models.Model):
                 tracking_number = response['data']['tracking_number']
             else:
                 raise UserError(response['msg'])
+
+            mp_labels = [('%s-%s-%s.%s' % (
+            self.mp_default_package_type_id.shipper_package_code, tracking_number, 1, self.mp_label_format),
+                          response['data']['label'])]
+            for pick in lognote_pickings:
+                pick.message_post(body='MP Delivery Documents', attachments=mp_labels)
 
             shipping_data = {
                 'exact_price': 0,
@@ -118,20 +123,29 @@ class Providermp(models.Model):
 
     def mp_get_return_label(self, picking, tracking_number=None, origin_date=None):
         mp_provider = MPProvider(logging.getLogger(__name__), self.sudo().mp_username, self.sudo().mp_password)
-        if tracking_number:
-            response = mp_provider.call_shipping_remote({
-                'action': 'pdf',
-                'tracking_number': tracking_number,
-            })
-        else:
-            raise UserError(_('No tracking number provided.'))
-        logmessage = (_("Shipment created into MP <br/> <b>Tracking Number : </b>%s") % (tracking_number))
-        mp_labels = [('%s-%s-%s.%s' % (self.get_return_label_prefix(), tracking_number, 1, self.mp_label_format),
-                      response['data']['label'])]
 
         lognote_pickings = picking.sale_id.picking_ids if picking.sale_id else picking
+
+        response = mp_provider.call_shipping_remote({
+            'action': 'shipment',
+            'package_type': self.mp_default_package_type_id.shipper_package_code,
+            'consignor': mp_provider._set_consignee(picking.partner_id),
+            'consignee': mp_provider._set_shipper(picking.company_id.partner_id,
+                                                  picking.picking_type_id.warehouse_id.partner_id),
+            'reference_no': ('RE_%s' % picking.sale_id.name if picking.sale_id else picking.name),
+            'details': mp_provider._set_shipment_details(picking)
+        })
+
+        if response.get('status') == 200:
+            tracking_number = response['data']['tracking_number']
+        else:
+            raise UserError(response['msg'])
+
+        mp_labels = [('%s-%s-%s.%s' % (
+            self.mp_default_package_type_id.shipper_package_code, tracking_number, 1, self.mp_label_format),
+                      response['data']['label'])]
         for pick in lognote_pickings:
-            pick.message_post(body=logmessage, attachments=mp_labels)
+            pick.message_post(body='MP Return Documents', attachments=mp_labels)
 
         shipping_data = {
             'exact_price': 0,
