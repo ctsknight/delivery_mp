@@ -8,6 +8,25 @@
         <field name="shipper_package_code">mp_dpd</field>
         <field name="package_carrier_type">mp</field>
     </record>
+    <record id="product_product_delivery_mp_dpd" model="product.product">
+      <field name="name">MP DPD</field>
+      <field name="default_code">Delivery_012</field>
+      <field name="type">service</field>
+      <field name="categ_id" ref="delivery.product_category_deliveries"/>
+      <field name="sale_ok" eval="False"/>
+      <field name="purchase_ok" eval="False"/>
+      <field name="list_price">0.0</field>
+      <field name="invoice_policy">order</field>
+    </record>
+    <record id="delivery_carrier_mp_dpd" model="delivery.carrier">
+      <field name="name">MP DPD</field>
+      <field name="product_id" ref="delivery_mp.product_product_delivery_mp_dpd"/>
+      <field name="delivery_type">mp</field>
+      <field name="mp_username">techuser</field>
+      <field name="mp_password">Qwer1234@</field>
+      <field name="mp_default_package_type_id" ref="delivery_mp.mp_packaging_DPD"/>
+    </record>
+
     <record id="mp_packaging_SCHENKER" model="stock.package.type">
         <field name="name">MP DB Schenker</field>
         <field name="shipper_package_code">mp_schenker</field>
