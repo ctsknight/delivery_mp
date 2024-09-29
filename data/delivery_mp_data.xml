@@ -24,6 +24,7 @@
       <field name="delivery_type">mp</field>
       <field name="mp_username">techuser</field>
       <field name="mp_password">Qwer1234@</field>
+      <field name="mp_label_format">PDF</field>
       <field name="mp_default_package_type_id" ref="delivery_mp.mp_packaging_DPD"/>
     </record>
 

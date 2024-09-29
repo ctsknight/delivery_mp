@@ -110,29 +110,18 @@ class MPProvider():
         return bkg_details, total_weight
 
     def _set_shipment_details(self, picking):
-        shipment_details = {}
-        pieces = []
+        goods = []
         packages = picking.carrier_id._get_packages_from_picking(picking, picking.carrier_id.mp_default_package_type_id)
+        print(packages)
         for sequence, package in enumerate(packages):
-            piece = {}
-            piece['PieceID'] = sequence
-            piece['Height'] = package.dimension['height']
-            piece['Depth'] = package.dimension['length']
-            piece['Width'] = package.dimension['width']
-            piece['Weight'] = picking.carrier_id._mp_convert_weight(package.weight,
-                                                                 picking.carrier_id.mp_package_weight_unit)
-            piece['PieceContents'] = package.name
-            pieces.append(piece)
-        shipment_details['Pieces'] = pieces
-        shipment_details['WeightUnit'] = picking.carrier_id.mp_package_weight_unit
-        shipment_details['Date'] = date.today().strftime("%d-%m-%Y")
-        shipment_details['Contents'] = "MY DESCRIPTION"
-        shipment_details['DimensionUnit'] = picking.carrier_id.mp_package_dimension_unit
-        shipment_details['InsuredAmount'] = float_repr(
-            sum(pkg.total_cost for pkg in packages) * picking.carrier_id.shipping_insurance / 100, precision_digits=2)
-        currency = picking.group_id.sale_id.currency_id or picking.company_id.currency_id
-        shipment_details['CurrencyCode'] = currency.name
-        return shipment_details
+            for customs_item_id, commodity in enumerate(package.commodities):
+                customs_info = {
+                    'name': commodity.product_id.name,
+                    'quantity': commodity.qty,
+                    'code': commodity.product_id.code,
+                }
+                goods.append(customs_info)
+        return goods
 
     def _set_label(self, label):
         return label
