@@ -60,12 +60,17 @@ class Providermp(models.Model):
                 carrier.supports_shipping_insurance = True
 
     def mp_rate_shipment(self, order):
-        username = self.sudo().mp_username
-        password = self.sudo().mp_password
-
-        mp_provider = MPProvider(logging.getLogger(__name__), username, password, self.mp_default_package_type_id)
+        mp_provider = MPProvider(logging.getLogger(__name__), self.sudo().mp_username, self.sudo().mp_password)
         packages = self._get_packages_from_order(order, self.mp_default_package_type_id)
-        response = mp_provider.cal_rate_remote(self, packages, order.partner_shipping_id)
+        details, total_weight = mp_provider._set_dct_bkg_details(self, packages)
+
+        response = mp_provider.call_shipping_remote({
+            'action': 'rate',
+            'package_type': self.mp_default_package_type_id.shipper_package_code,
+            'country': order.partner_shipping_id.country_id.code,
+            'total_weight': total_weight
+        })
+
         if response.get('status') == 200:
             return {'success': True,
                     'price': response['data']['price'],
@@ -175,15 +180,30 @@ class Providermp(models.Model):
         """
 
     def mp_send_shipping(self, pickings):
-        print(pickings)
+        mp_provider = MPProvider(logging.getLogger(__name__), self.sudo().mp_username, self.sudo().mp_password)
         res = []
         for picking in pickings:
+            response = mp_provider.call_shipping_remote({
+                'action': 'shipment',
+                'package_type': self.mp_default_package_type_id.shipper_package_code,
+                'consignee': mp_provider._set_consignee(picking.partner_id),
+                'consignor': mp_provider._set_shipper(picking.company_id.partner_id,
+                                                                   picking.picking_type_id.warehouse_id.partner_id),
+                'reference_no': picking.sale_id.name if picking.sale_id else picking.name,
+                'details': mp_provider._set_shipment_details(picking)
+            })
+
+            if response.get('status') == 200:
+                tracking_number = response['data']['tracking_number']
+            else:
+                raise UserError(response['msg'])
+
             shipping_data = {
                 'exact_price': 0,
-                'tracking_number': '000011111',
+                'tracking_number': tracking_number,
             }
-            res.append(shipping_data)
 
+            res.append(shipping_data)
         """
         res = []
         for picking in pickings:

@@ -13,7 +13,7 @@ from odoo.tools import float_repr, float_round
 
 class MPProvider():
 
-    def __init__(self, debug_logger, username, password, package_type, prod_environment=False):
+    def __init__(self, debug_logger, username, password, prod_environment=False):
         self.debug_logger = debug_logger
         if not prod_environment:
             self.url = 'http://localhost:8000/api/odoo/logistics'
@@ -23,17 +23,10 @@ class MPProvider():
             'Authorization': 'Basic ' + base64.b64encode((username + ':' + password).encode('utf-8')).decode('utf-8'),
             'Content-type': 'application/json',
             'Accept': 'application/json'}
-        self.package_type = package_type
 
-    def cal_rate_remote(self, carrier, packages, destination_partner_id):
-        self.debug_logger.info("start rate shipment calculation with package type %s........", self.package_type)
-        details, total_weight = self._set_dct_bkg_details(carrier, packages)
-        response = requests.post(self.url, headers=self.headers, data=json.dumps({
-            'package_type': self.package_type.shipper_package_code,
-            'country': destination_partner_id.country_id.code,
-            'total_weight': total_weight
-        }))
-
+    def call_shipping_remote(self, data):
+        self.debug_logger.info("start call remote api %s........", data)
+        response = requests.post(self.url, headers=self.headers, data=json.dumps(data))
         if response.status_code != 200:
             raise UserError(response.text)
         else:
@@ -132,8 +125,6 @@ class MPProvider():
             pieces.append(piece)
         shipment_details['Pieces'] = pieces
         shipment_details['WeightUnit'] = picking.carrier_id.mp_package_weight_unit
-        shipment_details['GlobalProductCode'] = picking.carrier_id.mp_product_code
-        shipment_details['LocalProductCode'] = picking.carrier_id.mp_product_code
         shipment_details['Date'] = date.today().strftime("%d-%m-%Y")
         shipment_details['Contents'] = "MY DESCRIPTION"
         shipment_details['DimensionUnit'] = picking.carrier_id.mp_package_dimension_unit
