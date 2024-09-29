@@ -10,7 +10,6 @@ from odoo.tools.safe_eval import const_eval
 
 import logging
 
-
 class Providermp(models.Model):
     _inherit = 'delivery.carrier'
 
@@ -22,8 +21,7 @@ class Providermp(models.Model):
     mp_password = fields.Char(string="MP Password", groups="base.group_system")
     mp_label_format = fields.Selection([
         ('PNG', 'PNG'),
-        ('PDF', 'PDF'),
-        ('JPEG', 'JPEG'),
+        ('PDF', 'PDF')
     ], string="Label Image Format", default='PDF')
 
     mp_package_dimension_unit = fields.Selection([('I', 'Inches'),
@@ -63,7 +61,7 @@ class Providermp(models.Model):
                 carrier.supports_shipping_insurance = True
 
     def mp_rate_shipment(self, order):
-        mp_provider = MPProvider(logging.getLogger(__name__), self.sudo().mp_username, self.sudo().mp_password)
+        mp_provider = MPProvider(logging.getLogger(__name__), self.sudo().mp_username, self.sudo().mp_password, self.prod_environment)
         packages = self._get_packages_from_order(order, self.mp_default_package_type_id)
         details, total_weight = mp_provider._set_dct_bkg_details(self, packages)
 
@@ -86,7 +84,7 @@ class Providermp(models.Model):
                     'warning_message': False}
 
     def mp_send_shipping(self, pickings):
-        mp_provider = MPProvider(logging.getLogger(__name__), self.sudo().mp_username, self.sudo().mp_password)
+        mp_provider = MPProvider(logging.getLogger(__name__), self.sudo().mp_username, self.sudo().mp_password, self.prod_environment)
         res = []
         for picking in pickings:
             lognote_pickings = picking.sale_id.picking_ids if picking.sale_id else picking

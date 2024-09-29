@@ -10,7 +10,7 @@
     </record>
     <record id="product_product_delivery_mp_dpd" model="product.product">
       <field name="name">MP DPD</field>
-      <field name="default_code">Delivery_012</field>
+      <field name="default_code">Delivery_201</field>
       <field name="type">service</field>
       <field name="categ_id" ref="delivery.product_category_deliveries"/>
       <field name="sale_ok" eval="False"/>
@@ -33,15 +33,74 @@
         <field name="shipper_package_code">mp_schenker</field>
         <field name="package_carrier_type">mp</field>
     </record>
-        <record id="mp_packaging_DHL" model="stock.package.type">
+    <record id="product_product_delivery_mp_schenker" model="product.product">
+      <field name="name">MP DPD</field>
+      <field name="default_code">Delivery_202</field>
+      <field name="type">service</field>
+      <field name="categ_id" ref="delivery.product_category_deliveries"/>
+      <field name="sale_ok" eval="False"/>
+      <field name="purchase_ok" eval="False"/>
+      <field name="list_price">0.0</field>
+      <field name="invoice_policy">order</field>
+    </record>
+    <record id="delivery_carrier_mp_schenker" model="delivery.carrier">
+      <field name="name">MP DB Schenker</field>
+      <field name="product_id" ref="delivery_mp.product_product_delivery_mp_schenker"/>
+      <field name="delivery_type">mp</field>
+      <field name="mp_username">techuser</field>
+      <field name="mp_password">Qwer1234@</field>
+      <field name="mp_label_format">PDF</field>
+      <field name="mp_default_package_type_id" ref="delivery_mp.mp_packaging_SCHENKER"/>
+    </record>
+
+    <record id="mp_packaging_DHL" model="stock.package.type">
         <field name="name">MP DHL</field>
         <field name="shipper_package_code">mp_dhl</field>
         <field name="package_carrier_type">mp</field>
     </record>
+    <record id="product_product_delivery_mp_dhl" model="product.product">
+      <field name="name">MP DHL</field>
+      <field name="default_code">Delivery_203</field>
+      <field name="type">service</field>
+      <field name="categ_id" ref="delivery.product_category_deliveries"/>
+      <field name="sale_ok" eval="False"/>
+      <field name="purchase_ok" eval="False"/>
+      <field name="list_price">0.0</field>
+      <field name="invoice_policy">order</field>
+    </record>
+    <record id="delivery_carrier_mp_dhl" model="delivery.carrier">
+      <field name="name">MP DB Schenker</field>
+      <field name="product_id" ref="delivery_mp.product_product_delivery_mp_dhl"/>
+      <field name="delivery_type">mp</field>
+      <field name="mp_username">techuser</field>
+      <field name="mp_password">Qwer1234@</field>
+      <field name="mp_label_format">PDF</field>
+      <field name="mp_default_package_type_id" ref="delivery_mp.mp_packaging_DHL"/>
+    </record>
+
     <record id="mp_packaging_UPS" model="stock.package.type">
         <field name="name">MP UPS</field>
         <field name="shipper_package_code">mp_ups</field>
         <field name="package_carrier_type">mp</field>
+    </record>
+    <record id="product_product_delivery_mp_ups" model="product.product">
+      <field name="name">MP UPS</field>
+      <field name="default_code">Delivery_204</field>
+      <field name="type">service</field>
+      <field name="categ_id" ref="delivery.product_category_deliveries"/>
+      <field name="sale_ok" eval="False"/>
+      <field name="purchase_ok" eval="False"/>
+      <field name="list_price">0.0</field>
+      <field name="invoice_policy">order</field>
+    </record>
+    <record id="delivery_carrier_mp_ups" model="delivery.carrier">
+      <field name="name">MP UPS</field>
+      <field name="product_id" ref="delivery_mp.product_product_delivery_mp_ups"/>
+      <field name="delivery_type">mp</field>
+      <field name="mp_username">techuser</field>
+      <field name="mp_password">Qwer1234@</field>
+      <field name="mp_label_format">PDF</field>
+      <field name="mp_default_package_type_id" ref="delivery_mp.mp_packaging_UPS"/>
     </record>
 
     <!-- MP Commercial Invoice Sequence -->
