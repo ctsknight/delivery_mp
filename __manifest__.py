@@ -4,7 +4,7 @@
     'name': "MP Shipping",
     'description': "Send your shippings through MP and track them online",
     'category': 'Inventory/Delivery',
-    'author': "MP Group",
+    'author': "Mulitpunkt",
  #   'sequence': 285,
     'version': '1.0',
     'application': True,
@@ -12,7 +12,7 @@
     'data': [
         'data/delivery_mp_data.xml',
         'views/delivery_mp_view.xml',
-#       'views/res_config_settings_views.xml',
+       ## 'views/res_config_settings_views.xml',
     ],
     'demo': [
         'demo/demo.xml',

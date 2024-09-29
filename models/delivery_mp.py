@@ -13,6 +13,7 @@ import logging
 import json
 import requests
 
+
 class Providermp(models.Model):
     _inherit = 'delivery.carrier'
 
@@ -20,88 +21,26 @@ class Providermp(models.Model):
         ('mp', "MP")
     ], ondelete={'mp': lambda recs: recs.write({'delivery_type': 'fixed', 'fixed_price': 0})})
 
-    mp_SiteID = fields.Char(string="MP SiteID", groups="base.group_system")
+    mp_username = fields.Char(string="MP username", groups="base.group_system")
     mp_password = fields.Char(string="MP Password", groups="base.group_system")
-    mp_account_number = fields.Char(string="MP Account Number", groups="base.group_system")
     mp_package_dimension_unit = fields.Selection([('I', 'Inches'),
-                                                   ('C', 'Centimeters')],
-                                                  default='C',
-                                                  string='Package Dimension Unit')
+                                                  ('C', 'Centimeters')],
+                                                 default='C',
+                                                 string='Package Dimension Unit')
     mp_package_weight_unit = fields.Selection([('L', 'Pounds'),
-                                                ('K', 'Kilograms')],
-                                               default='K',
-                                               string="Package Weight Unit")
+                                               ('K', 'Kilograms')],
+                                              default='K',
+                                              string="Package Weight Unit")
     mp_default_package_type_id = fields.Many2one('stock.package.type', string='MP Package Type')
-    mp_region_code = fields.Selection([('AP', 'Asia Pacific'),
-                                        ('AM', 'America'),
-                                        ('EU', 'Europe')],
-                                       default='AM',
-                                       string='Region')
-    # Nowadays hidden, by default it's the D, couldn't find any documentation on other services
-    mp_product_code = fields.Selection([('0', '0 - Logistics Services'),
-                                         ('1', '1 - Domestic Express 12:00'),
-                                         ('2', '2 - B2C'),
-                                         ('3', '3 - B2C'),
-                                         ('4', '4 - Jetline'),
-                                         ('5', '5 - Sprintline'),
-                                         ('6', '6 - Secureline'),
-                                         ('7', '7 - Express Easy'),
-                                         ('8', '8 - Express Easy'),
-                                         ('9', '9 - Europack'),
-                                         ('A', 'A - Auto Reversals'),
-                                         ('B', 'B - Break Bulk Express'),
-                                         ('C', 'C - Medical Express'),
-                                         ('D', 'D - Express Worldwide'),
-                                         ('E', 'E - Express 9:00'),
-                                         ('F', 'F - Freight Worldwide'),
-                                         ('G', 'G - Domestic Economy Select'),
-                                         ('H', 'H - Economy Select'),
-                                         ('I', 'I - Break Bulk Economy'),
-                                         ('J', 'J - Jumbo Box'),
-                                         ('K', 'K - Express 9:00'),
-                                         ('L', 'L - Express 10:30'),
-                                         ('M', 'M - Express 10:30'),
-                                         ('N', 'N - Domestic Express'),
-                                         ('O', 'O - DOM Express 10:30'),
-                                         ('P', 'P - Express Worldwide'),
-                                         ('Q', 'Q - Medical Express'),
-                                         ('R', 'R - GlobalMail Business'),
-                                         ('S', 'S - Same Day'),
-                                         ('T', 'T - Express 12:00'),
-                                         ('U', 'U - Express Worldwide'),
-                                         ('V', 'V - Europack'),
-                                         ('W', 'W - Economy Select'),
-                                         ('X', 'X - Express Envelope'),
-                                         ('Y', 'Y - Express 12:00'),
-                                         ('Z', 'Z - Destination Charges'),
-                                         ],
-                                        default='D',
-                                        string='MP Product')
-    mp_dutiable = fields.Boolean(string="Dutiable Material", help="Check this if your package is dutiable.")
-    mp_duty_payment = fields.Selection([('S', 'Sender'), ('R', 'Recipient')], required=True, default="S")
-    mp_label_image_format = fields.Selection([
-        ('EPL2', 'EPL2'),
-        ('PDF', 'PDF'),
-        ('ZPL2', 'ZPL2'),
-    ], string="Label Image Format", default='PDF')
-    mp_label_template = fields.Selection([
-        ('8X4_A4_PDF', '8X4_A4_PDF'),
-        ('8X4_thermal', '8X4_thermal'),
-        ('8X4_A4_TC_PDF', '8X4_A4_TC_PDF'),
-        ('6X4_thermal', '6X4_thermal'),
-        ('6X4_A4_PDF', '6X4_A4_PDF'),
-        ('8X4_CI_PDF', '8X4_CI_PDF'),
-        ('8X4_CI_thermal', '8X4_CI_thermal'),
-        ('8X4_RU_A4_PDF', '8X4_RU_A4_PDF'),
-        ('6X4_PDF', '6X4_PDF'),
-        ('8X4_PDF', '8X4_PDF')
-    ], string="Label Template", default='8X4_A4_PDF')
     mp_custom_data_request = fields.Text(
         'Custom data for MP requests,',
         help="""The custom data in MP is organized like the inside of a json file.
         There are 3 possible keys: 'rate', 'ship', 'return', to which you can add your custom data.
         More info on https://xmlportal.dhl.com/"""
     )
+
+    def __init__(self, env, ids, prefetch_ids):
+        super().__init__(env, ids, prefetch_ids)
 
     @api.ondelete(at_uninstall=False)
     def _unlink_except_commercial_invoice_sequence(self):
@@ -121,28 +60,21 @@ class Providermp(models.Model):
                 carrier.supports_shipping_insurance = True
 
     def mp_rate_shipment(self, order):
-        
-        #res = self._rate_shipment_vals(order=order)
-        #return res
-        _logger = logging.getLogger(__name__)
-        _logger.info("start rate shipment........")
-        headers = {"Content-Type": "application/json", "Accept": "application/json", "Catch-Control": "no-cache"}
-        url = "http://127.0.0.1:5000/price"
-        
-        total_value = sum(line.price_reduce_taxinc * line.product_uom_qty for line in order.order_line.filtered(lambda l: l.product_id.type in ('consu', 'product') and not l.display_type))
-        site_id = self.sudo().mp_SiteID
+        username = self.sudo().mp_username
         password = self.sudo().mp_password
 
-        json_data = {"site_id":site_id, "password":password, "total_value":total_value}
-        _logger.info(json_data)
-        response = requests.post(url, data=json.dumps(json_data), headers=headers)
-        price = response.json()["price"]
-        _logger.info(price)
-        #print(response)
-        #print(price)
-        return {'success': True,
-                    'price': price,
+        mp_provider = MPProvider(logging.getLogger(__name__), username, password, self.mp_default_package_type_id)
+        packages = self._get_packages_from_order(order, self.mp_default_package_type_id)
+        response = mp_provider.cal_rate_remote(self, packages, order.partner_shipping_id)
+        if response.get('status') == 200:
+            return {'success': True,
+                    'price': response['data']['price'],
                     'error_message': False,
+                    'warning_message': False}
+        else:
+            return {'success': False,
+                    'price': 0.0,
+                    'error_message': response.get('msg', ''),
                     'warning_message': False}
 
     """
@@ -167,7 +99,7 @@ class Providermp(models.Model):
                     'price': 0.0,
                     'error_message': check_value,
                     'warning_message': False}
-        site_id = self.sudo().mp_SiteID
+        site_id = self.sudo().mp_username
         password = self.sudo().mp_password
         rating_request['Request'] = srm._set_request(site_id, password)
         rating_request['From'] = srm._set_dct_from(warehouse_partner_id)
@@ -243,12 +175,21 @@ class Providermp(models.Model):
         """
 
     def mp_send_shipping(self, pickings):
+        print(pickings)
+        res = []
+        for picking in pickings:
+            shipping_data = {
+                'exact_price': 0,
+                'tracking_number': '000011111',
+            }
+            res.append(shipping_data)
+
         """
         res = []
         for picking in pickings:
             shipment_request = {}
             srm = MPProvider(self.log_xml, request_type="ship", prod_environment=self.prod_environment)
-            site_id = self.sudo().mp_SiteID
+            site_id = self.sudo().mp_username
             password = self.sudo().mp_password
             account_number = self.sudo().mp_account_number
             shipment_request['Request'] = srm._set_request(site_id, password)
@@ -297,14 +238,13 @@ class Providermp(models.Model):
             if self.return_label_on_delivery:
                 self.get_return_label(picking)
             res = res + [shipping_data]
-
-        return res
         """
+        return res
 
     def mp_get_return_label(self, picking, tracking_number=None, origin_date=None):
         shipment_request = {}
         srm = MPProvider(self.log_xml, request_type="ship", prod_environment=self.prod_environment)
-        site_id = self.sudo().mp_SiteID
+        site_id = self.sudo().mp_username
         password = self.sudo().mp_password
         account_number = self.sudo().mp_account_number
         shipment_request['Request'] = srm._set_request(site_id, password)
@@ -332,8 +272,10 @@ class Providermp(models.Model):
         mp_response = srm._process_shipment(shipment_request)
         traking_number = mp_response.AirwayBillNumber
         logmessage = (_("Shipment created into DHL <br/> <b>Tracking Number : </b>%s") % (traking_number))
-        mp_labels = [('%s-%s-%s.%s' % (self.get_return_label_prefix(), traking_number, 1, self.mp_label_image_format), mp_response.LabelImage[0].OutputImage)]
-        mp_cmi = [('ReturnDocumentDHL-%s.%s' % (mlabel.DocName, mlabel.DocFormat), mlabel.DocImageVal) for mlabel in mp_response.LabelImage[0].MultiLabels.MultiLabel] if mp_response.LabelImage[0].MultiLabels else None
+        mp_labels = [('%s-%s-%s.%s' % (self.get_return_label_prefix(), traking_number, 1, self.mp_label_image_format),
+                      mp_response.LabelImage[0].OutputImage)]
+        mp_cmi = [('ReturnDocumentDHL-%s.%s' % (mlabel.DocName, mlabel.DocFormat), mlabel.DocImageVal) for mlabel in
+                  mp_response.LabelImage[0].MultiLabels.MultiLabel] if mp_response.LabelImage[0].MultiLabels else None
         lognote_pickings = picking.sale_id.picking_ids if picking.sale_id else picking
         for pick in lognote_pickings:
             pick.message_post(body=logmessage, attachments=mp_labels)
@@ -350,16 +292,13 @@ class Providermp(models.Model):
 
     def mp_cancel_shipment(self, picking):
         # Obviously you need a pick up date to delete SHIPMENT by DHL. So you can't do it if you didn't schedule a pick-up.
-        picking.message_post(body=_(u"You can't cancel DHL shipping without pickup date."))
+        picking.message_post(body=_(u"You can't cancel MP shipping without pickup date."))
         picking.write({'carrier_tracking_ref': '',
                        'carrier_price': 0.0})
 
     def _mp_convert_weight(self, weight, unit):
         weight_uom_id = self.env['product.template']._get_weight_uom_id_from_ir_config_parameter()
-        if unit == 'L':
-            weight = weight_uom_id._compute_quantity(weight, self.env.ref('uom.product_uom_lb'), round=False)
-        else:
-            weight = weight_uom_id._compute_quantity(weight, self.env.ref('uom.product_uom_kgm'), round=False)
+        weight = weight_uom_id._compute_quantity(weight, self.env.ref('uom.product_uom_kgm'), round=False)
         return float_repr(weight, 3)
 
     def _mp_add_custom_data_to_request(self, request, request_type):
