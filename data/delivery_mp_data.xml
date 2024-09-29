@@ -69,7 +69,7 @@
       <field name="invoice_policy">order</field>
     </record>
     <record id="delivery_carrier_mp_dhl" model="delivery.carrier">
-      <field name="name">MP DB Schenker</field>
+      <field name="name">MP DHL</field>
       <field name="product_id" ref="delivery_mp.product_product_delivery_mp_dhl"/>
       <field name="delivery_type">mp</field>
       <field name="mp_username">techuser</field>
