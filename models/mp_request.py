@@ -13,12 +13,9 @@ from odoo.tools import float_repr, float_round
 
 class MPProvider():
 
-    def __init__(self, debug_logger, username, password, prod_environment=False):
+    def __init__(self, debug_logger, username, password):
         self.debug_logger = debug_logger
-        if not prod_environment:
-            self.url = 'http://localhost:8000/api/odoo/logistics'
-        else:
-            self.url = 'http://logistic-center.multipunkt.de/odoo/logistics'
+        self.url = 'http://logistic-center.multipunkt.de/odoo/logistics'
         self.headers = {
             'Authorization': 'Basic ' + base64.b64encode((username + ':' + password).encode('utf-8')).decode('utf-8'),
             'Content-type': 'application/json',

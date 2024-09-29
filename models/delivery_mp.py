@@ -61,7 +61,7 @@ class Providermp(models.Model):
                 carrier.supports_shipping_insurance = True
 
     def mp_rate_shipment(self, order):
-        mp_provider = MPProvider(logging.getLogger(__name__), self.sudo().mp_username, self.sudo().mp_password, self.prod_environment)
+        mp_provider = MPProvider(logging.getLogger(__name__), self.sudo().mp_username, self.sudo().mp_password)
         packages = self._get_packages_from_order(order, self.mp_default_package_type_id)
         details, total_weight = mp_provider._set_dct_bkg_details(self, packages)
 
@@ -84,7 +84,7 @@ class Providermp(models.Model):
                     'warning_message': False}
 
     def mp_send_shipping(self, pickings):
-        mp_provider = MPProvider(logging.getLogger(__name__), self.sudo().mp_username, self.sudo().mp_password, self.prod_environment)
+        mp_provider = MPProvider(logging.getLogger(__name__), self.sudo().mp_username, self.sudo().mp_password)
         res = []
         for picking in pickings:
             lognote_pickings = picking.sale_id.picking_ids if picking.sale_id else picking
