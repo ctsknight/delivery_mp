@@ -107,10 +107,11 @@ class MPProvider():
         return bkg_details, total_weight
 
     def _set_shipment_details(self, picking):
-        goods = []
+        package_infos = []
+        total_weight = 0
         packages = picking.carrier_id._get_packages_from_picking(picking, picking.carrier_id.mp_default_package_type_id)
-        print(packages)
         for sequence, package in enumerate(packages):
+            goods = []
             for customs_item_id, commodity in enumerate(package.commodities):
                 customs_info = {
                     'name': commodity.product_id.name,
@@ -119,7 +120,20 @@ class MPProvider():
                     'weight': commodity.product_id.weight,
                 }
                 goods.append(customs_info)
-        return goods
+            package_weight = picking.carrier_id._mp_convert_weight(package.weight, picking.carrier_id.mp_package_weight_unit)
+            package_infos.append({
+                'height': package.dimension['height'],
+                'depth': package.dimension['length'],
+                'width': package.dimension['width'],
+                'Weight': package_weight,
+                'goods': goods,
+            })
+            total_weight += float(package_weight)
+
+        return {
+            'total_weight': total_weight,
+            'package_infos': package_infos
+        }
 
     def _set_label(self, label):
         return label
