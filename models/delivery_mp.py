@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
+import base64
+
 from .mp_request import MPProvider
 from odoo.tools.zeep.helpers import serialize_object
 
@@ -104,9 +106,11 @@ class Providermp(models.Model):
             else:
                 raise UserError(response['msg'])
 
-            mp_labels = [('%s-%s-%s.%s' % (
-            self.mp_default_package_type_id.shipper_package_code, tracking_number, 1, self.mp_label_format),
-                          response['data']['label'])]
+            pdf_data = base64.b64decode(response['data']['label'])
+
+            mp_labels = [('%s.%s' % (tracking_number, self.mp_label_format),
+                          pdf_data)]
+
             for pick in lognote_pickings:
                 pick.message_post(body='MP Delivery Documents', attachments=mp_labels)
 
@@ -138,10 +142,11 @@ class Providermp(models.Model):
             tracking_number = response['data']['tracking_number']
         else:
             raise UserError(response['msg'])
+        pdf_data = base64.b64decode(response['data']['label'])
 
-        mp_labels = [('%s-%s-%s.%s' % (
-            self.mp_default_package_type_id.shipper_package_code, tracking_number, 1, self.mp_label_format),
-                      response['data']['label'])]
+        mp_labels = [('%s.%s' % (tracking_number, self.mp_label_format),
+                      pdf_data)]
+
         for pick in lognote_pickings:
             pick.message_post(body='MP Return Documents', attachments=mp_labels)
 

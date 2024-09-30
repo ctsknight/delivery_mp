@@ -15,7 +15,7 @@ class MPProvider():
 
     def __init__(self, debug_logger, username, password):
         self.debug_logger = debug_logger
-        self.url = 'http://logistic-center.multipunkt.de/api/odoo/logistics'
+        self.url = 'http://localhost:8000/api/odoo/logistics'
         self.headers = {
             'Authorization': 'Basic ' + base64.b64encode((username + ':' + password).encode('utf-8')).decode('utf-8'),
             'Content-type': 'application/json',
@@ -116,6 +116,7 @@ class MPProvider():
                     'name': commodity.product_id.name,
                     'quantity': commodity.qty,
                     'code': commodity.product_id.code,
+                    'weight': commodity.product_id.weight,
                 }
                 goods.append(customs_info)
         return goods
