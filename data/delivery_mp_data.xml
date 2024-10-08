@@ -28,13 +28,13 @@
       <field name="mp_default_package_type_id" ref="delivery_mp.mp_packaging_SHOP"/>
     </record>
 
-    <record id="mp_packaging_DPD" model="stock.package.type">
-        <field name="name">MP DPD</field>
-        <field name="shipper_package_code">mp_dpd</field>
+    <record id="mp_packaging_DPD_Paket_Standard" model="stock.package.type">
+        <field name="name">MP DPD Paket Standard </field>
+        <field name="shipper_package_code">mp_dpd_paket_standard</field>
         <field name="package_carrier_type">mp</field>
     </record>
-    <record id="product_product_delivery_mp_dpd" model="product.product">
-      <field name="name">MP DPD</field>
+    <record id="product_product_delivery_mp_dpd_paket_standard" model="product.product">
+      <field name="name">MP DPD Paket Standard</field>
       <field name="default_code">Delivery_201</field>
       <field name="type">service</field>
       <field name="categ_id" ref="delivery.product_category_deliveries"/>
@@ -43,23 +43,23 @@
       <field name="list_price">0.0</field>
       <field name="invoice_policy">order</field>
     </record>
-    <record id="delivery_carrier_mp_dpd" model="delivery.carrier">
-      <field name="name">MP DPD</field>
-      <field name="product_id" ref="delivery_mp.product_product_delivery_mp_dpd"/>
+    <record id="delivery_carrier_mp_dpd_paket_standard" model="delivery.carrier">
+      <field name="name">MP DPD Paket Standard</field>
+      <field name="product_id" ref="delivery_mp.product_product_delivery_mp_dpd_paket_standard"/>
       <field name="delivery_type">mp</field>
       <field name="mp_username">techuser</field>
       <field name="mp_password">Qwer1234@</field>
       <field name="mp_label_format">PDF</field>
-      <field name="mp_default_package_type_id" ref="delivery_mp.mp_packaging_DPD"/>
+      <field name="mp_default_package_type_id" ref="delivery_mp.mp_packaging_DPD_Paket_Standard"/>
     </record>
 
-    <record id="mp_packaging_SCHENKER" model="stock.package.type">
-        <field name="name">MP DB Schenker</field>
-        <field name="shipper_package_code">mp_schenker</field>
+    <record id="mp_packaging_DPD_Paket_Express" model="stock.package.type">
+        <field name="name">MP DPD Paket Express </field>
+        <field name="shipper_package_code">mp_dpd_paket_express</field>
         <field name="package_carrier_type">mp</field>
     </record>
-    <record id="product_product_delivery_mp_schenker" model="product.product">
-      <field name="name">MP DPD</field>
+    <record id="product_product_delivery_mp_dpd_paket_express" model="product.product">
+      <field name="name">MP DPD Paket Express</field>
       <field name="default_code">Delivery_202</field>
       <field name="type">service</field>
       <field name="categ_id" ref="delivery.product_category_deliveries"/>
@@ -68,23 +68,23 @@
       <field name="list_price">0.0</field>
       <field name="invoice_policy">order</field>
     </record>
-    <record id="delivery_carrier_mp_schenker" model="delivery.carrier">
-      <field name="name">MP DB Schenker</field>
-      <field name="product_id" ref="delivery_mp.product_product_delivery_mp_schenker"/>
+    <record id="delivery_carrier_mp_dpd_paket_express" model="delivery.carrier">
+      <field name="name">MP DPD</field>
+      <field name="product_id" ref="delivery_mp.product_product_delivery_mp_dpd_paket_express"/>
       <field name="delivery_type">mp</field>
       <field name="mp_username">techuser</field>
       <field name="mp_password">Qwer1234@</field>
       <field name="mp_label_format">PDF</field>
-      <field name="mp_default_package_type_id" ref="delivery_mp.mp_packaging_SCHENKER"/>
+      <field name="mp_default_package_type_id" ref="delivery_mp.mp_packaging_DPD_Paket_Express"/>
     </record>
 
-    <record id="mp_packaging_DHL" model="stock.package.type">
-        <field name="name">MP DHL</field>
-        <field name="shipper_package_code">mp_dhl</field>
+    <record id="mp_packaging_DHL_Paket_Standard" model="stock.package.type">
+        <field name="name">MP DHL Paket Standard </field>
+        <field name="shipper_package_code">mp_dhl_paket_standard</field>
         <field name="package_carrier_type">mp</field>
     </record>
-    <record id="product_product_delivery_mp_dhl" model="product.product">
-      <field name="name">MP DHL</field>
+    <record id="product_product_delivery_mp_dhl_paket_standard" model="product.product">
+      <field name="name">MP DHL Paket Standard</field>
       <field name="default_code">Delivery_203</field>
       <field name="type">service</field>
       <field name="categ_id" ref="delivery.product_category_deliveries"/>
@@ -93,23 +93,23 @@
       <field name="list_price">0.0</field>
       <field name="invoice_policy">order</field>
     </record>
-    <record id="delivery_carrier_mp_dhl" model="delivery.carrier">
-      <field name="name">MP DHL</field>
-      <field name="product_id" ref="delivery_mp.product_product_delivery_mp_dhl"/>
+    <record id="delivery_carrier_mp_dhl_paket_standard" model="delivery.carrier">
+      <field name="name">MP DHL Paket Standard</field>
+      <field name="product_id" ref="delivery_mp.product_product_delivery_mp_dhl_paket_standard"/>
       <field name="delivery_type">mp</field>
       <field name="mp_username">techuser</field>
       <field name="mp_password">Qwer1234@</field>
       <field name="mp_label_format">PDF</field>
-      <field name="mp_default_package_type_id" ref="delivery_mp.mp_packaging_DHL"/>
+      <field name="mp_default_package_type_id" ref="delivery_mp.mp_packaging_DHL_Paket_Standard"/>
     </record>
 
-    <record id="mp_packaging_UPS" model="stock.package.type">
-        <field name="name">MP UPS</field>
-        <field name="shipper_package_code">mp_ups</field>
+    <record id="mp_packaging_DHL_Paket_Express" model="stock.package.type">
+        <field name="name">MP DHL Paket Express </field>
+        <field name="shipper_package_code">mp_dhl_paket_express</field>
         <field name="package_carrier_type">mp</field>
     </record>
-    <record id="product_product_delivery_mp_ups" model="product.product">
-      <field name="name">MP UPS</field>
+    <record id="product_product_delivery_mp_dhl_paket_express" model="product.product">
+      <field name="name">MP DHL Paket Express</field>
       <field name="default_code">Delivery_204</field>
       <field name="type">service</field>
       <field name="categ_id" ref="delivery.product_category_deliveries"/>
@@ -118,14 +118,164 @@
       <field name="list_price">0.0</field>
       <field name="invoice_policy">order</field>
     </record>
-    <record id="delivery_carrier_mp_ups" model="delivery.carrier">
-      <field name="name">MP UPS</field>
-      <field name="product_id" ref="delivery_mp.product_product_delivery_mp_ups"/>
+    <record id="delivery_carrier_mp_dhl_paket_express" model="delivery.carrier">
+      <field name="name">MP DHL Paket Express</field>
+      <field name="product_id" ref="delivery_mp.product_product_delivery_mp_dhl_paket_express"/>
       <field name="delivery_type">mp</field>
       <field name="mp_username">techuser</field>
       <field name="mp_password">Qwer1234@</field>
       <field name="mp_label_format">PDF</field>
-      <field name="mp_default_package_type_id" ref="delivery_mp.mp_packaging_UPS"/>
+      <field name="mp_default_package_type_id" ref="delivery_mp.mp_packaging_DHL_Paket_Express"/>
+    </record>
+
+    <record id="mp_packaging_UPS_Paket_Standard" model="stock.package.type">
+        <field name="name">MP UPS Paket Standard </field>
+        <field name="shipper_package_code">mp_ups_paket_standard</field>
+        <field name="package_carrier_type">mp</field>
+    </record>
+    <record id="product_product_delivery_mp_ups_paket_standard" model="product.product">
+      <field name="name">MP UPS Paket Standard</field>
+      <field name="default_code">Delivery_205</field>
+      <field name="type">service</field>
+      <field name="categ_id" ref="delivery.product_category_deliveries"/>
+      <field name="sale_ok" eval="False"/>
+      <field name="purchase_ok" eval="False"/>
+      <field name="list_price">0.0</field>
+      <field name="invoice_policy">order</field>
+    </record>
+    <record id="delivery_carrier_mp_ups_paket_standard" model="delivery.carrier">
+      <field name="name">MP UPS Paket Standard</field>
+      <field name="product_id" ref="delivery_mp.product_product_delivery_mp_ups_paket_standard"/>
+      <field name="delivery_type">mp</field>
+      <field name="mp_username">techuser</field>
+      <field name="mp_password">Qwer1234@</field>
+      <field name="mp_label_format">PDF</field>
+      <field name="mp_default_package_type_id" ref="delivery_mp.mp_packaging_UPS_Paket_Standard"/>
+    </record>
+
+    <record id="mp_packaging_UPS_Paket_Express" model="stock.package.type">
+        <field name="name">MP UPS Paket Express </field>
+        <field name="shipper_package_code">mp_ups_paket_express</field>
+        <field name="package_carrier_type">mp</field>
+    </record>
+    <record id="product_product_delivery_mp_ups_paket_express" model="product.product">
+      <field name="name">MP UPS Paket Express</field>
+      <field name="default_code">Delivery_206</field>
+      <field name="type">service</field>
+      <field name="categ_id" ref="delivery.product_category_deliveries"/>
+      <field name="sale_ok" eval="False"/>
+      <field name="purchase_ok" eval="False"/>
+      <field name="list_price">0.0</field>
+      <field name="invoice_policy">order</field>
+    </record>
+    <record id="delivery_carrier_mp_ups_paket_express" model="delivery.carrier">
+      <field name="name">MP UPS Paket Express</field>
+      <field name="product_id" ref="delivery_mp.product_product_delivery_mp_ups_paket_express"/>
+      <field name="delivery_type">mp</field>
+      <field name="mp_username">techuser</field>
+      <field name="mp_password">Qwer1234@</field>
+      <field name="mp_label_format">PDF</field>
+      <field name="mp_default_package_type_id" ref="delivery_mp.mp_packaging_UPS_Paket_Express"/>
+    </record>
+
+        <record id="mp_packaging_DHL_FREIGHT_Standard" model="stock.package.type">
+        <field name="name">MP DHL FREIGHT Standard </field>
+        <field name="shipper_package_code">mp_dhl_freight_standard</field>
+        <field name="package_carrier_type">mp</field>
+    </record>
+    <record id="product_product_delivery_mp_dhl_freight_standard" model="product.product">
+      <field name="name">MP DHL FREIGHT Standard</field>
+      <field name="default_code">Delivery_207</field>
+      <field name="type">service</field>
+      <field name="categ_id" ref="delivery.product_category_deliveries"/>
+      <field name="sale_ok" eval="False"/>
+      <field name="purchase_ok" eval="False"/>
+      <field name="list_price">0.0</field>
+      <field name="invoice_policy">order</field>
+    </record>
+    <record id="delivery_carrier_mp_dhl_freight_standard" model="delivery.carrier">
+      <field name="name">MP DHL FREIGHT Standard</field>
+      <field name="product_id" ref="delivery_mp.product_product_delivery_mp_dhl_freight_standard"/>
+      <field name="delivery_type">mp</field>
+      <field name="mp_username">techuser</field>
+      <field name="mp_password">Qwer1234@</field>
+      <field name="mp_label_format">PDF</field>
+      <field name="mp_default_package_type_id" ref="delivery_mp.mp_packaging_DHL_FREIGHT_Standard"/>
+    </record>
+
+    <record id="mp_packaging_DHL_FREIGHT_Danger" model="stock.package.type">
+        <field name="name">MP DHL FREIGHT Danger </field>
+        <field name="shipper_package_code">mp_dhl_freight_danger</field>
+        <field name="package_carrier_type">mp</field>
+    </record>
+    <record id="product_product_delivery_mp_dhl_freight_danger" model="product.product">
+      <field name="name">MP DHL FREIGHT Danger</field>
+      <field name="default_code">Delivery_208</field>
+      <field name="type">service</field>
+      <field name="categ_id" ref="delivery.product_category_deliveries"/>
+      <field name="sale_ok" eval="False"/>
+      <field name="purchase_ok" eval="False"/>
+      <field name="list_price">0.0</field>
+      <field name="invoice_policy">order</field>
+    </record>
+    <record id="delivery_carrier_mp_dhl_freight_danger" model="delivery.carrier">
+      <field name="name">MP DHL FREIGHT Danger</field>
+      <field name="product_id" ref="delivery_mp.product_product_delivery_mp_dhl_freight_danger"/>
+      <field name="delivery_type">mp</field>
+      <field name="mp_username">techuser</field>
+      <field name="mp_password">Qwer1234@</field>
+      <field name="mp_label_format">PDF</field>
+      <field name="mp_default_package_type_id" ref="delivery_mp.mp_packaging_DHL_FREIGHT_Danger"/>
+    </record>
+
+        <record id="mp_packaging_DB_SCHENKER_Standard" model="stock.package.type">
+        <field name="name">MP DB SCHENKER Standard </field>
+        <field name="shipper_package_code">mp_db_schenker_standard</field>
+        <field name="package_carrier_type">mp</field>
+    </record>
+    <record id="product_product_delivery_mp_db_schenker_standard" model="product.product">
+      <field name="name">MP DB SCHENKER Standard</field>
+      <field name="default_code">Delivery_209</field>
+      <field name="type">service</field>
+      <field name="categ_id" ref="delivery.product_category_deliveries"/>
+      <field name="sale_ok" eval="False"/>
+      <field name="purchase_ok" eval="False"/>
+      <field name="list_price">0.0</field>
+      <field name="invoice_policy">order</field>
+    </record>
+    <record id="delivery_carrier_mp_db_schenker_standard" model="delivery.carrier">
+      <field name="name">MP DB SCHENKER Standard</field>
+      <field name="product_id" ref="delivery_mp.product_product_delivery_mp_db_schenker_standard"/>
+      <field name="delivery_type">mp</field>
+      <field name="mp_username">techuser</field>
+      <field name="mp_password">Qwer1234@</field>
+      <field name="mp_label_format">PDF</field>
+      <field name="mp_default_package_type_id" ref="delivery_mp.mp_packaging_DB_SCHENKER_Standard"/>
+    </record>
+
+    <record id="mp_packaging_DB_SCHENKER_Danger" model="stock.package.type">
+        <field name="name">MP DB SCHENKER Danger </field>
+        <field name="shipper_package_code">mp_db_schenker_danger</field>
+        <field name="package_carrier_type">mp</field>
+    </record>
+    <record id="product_product_delivery_mp_db_schenker_danger" model="product.product">
+      <field name="name">MP DB SCHENKER Danger</field>
+      <field name="default_code">Delivery_210</field>
+      <field name="type">service</field>
+      <field name="categ_id" ref="delivery.product_category_deliveries"/>
+      <field name="sale_ok" eval="False"/>
+      <field name="purchase_ok" eval="False"/>
+      <field name="list_price">0.0</field>
+      <field name="invoice_policy">order</field>
+    </record>
+    <record id="delivery_carrier_mp_db_schenker_danger" model="delivery.carrier">
+      <field name="name">MP DB SCHENKER Danger</field>
+      <field name="product_id" ref="delivery_mp.product_product_delivery_mp_db_schenker_danger"/>
+      <field name="delivery_type">mp</field>
+      <field name="mp_username">techuser</field>
+      <field name="mp_password">Qwer1234@</field>
+      <field name="mp_label_format">PDF</field>
+      <field name="mp_default_package_type_id" ref="delivery_mp.mp_packaging_DB_SCHENKER_Danger"/>
     </record>
 
     <!-- MP Commercial Invoice Sequence -->
