@@ -12,6 +12,7 @@ from odoo.tools.safe_eval import const_eval
 
 import logging
 
+
 class Providermp(models.Model):
     _inherit = 'delivery.carrier'
 
@@ -69,7 +70,7 @@ class Providermp(models.Model):
 
         response = mp_provider.call_shipping_remote({
             'action': 'rate',
-            'package_type': self.mp_default_package_type_id.shipper_package_code,
+            'shipping_method': self.mp_default_package_type_id.shipper_package_code,
             'country': order.partner_shipping_id.country_id.code,
             'total_weight': total_weight
         })
@@ -89,37 +90,45 @@ class Providermp(models.Model):
         mp_provider = MPProvider(logging.getLogger(__name__), self.sudo().mp_username, self.sudo().mp_password)
         res = []
         for picking in pickings:
-            lognote_pickings = picking.sale_id.picking_ids if picking.sale_id else picking
+            if picking.sale_id:
+                response = mp_provider.call_shipping_remote({
+                    'action': 'shipment',
+                    'warehouse': picking.location_id.warehouse_id.name,
+                    'shipping_method': self.mp_default_package_type_id.shipper_package_code,
+                    'consignee': mp_provider._set_consignee(picking.partner_id),
+                    'consignor': mp_provider._set_shipper(picking.company_id.partner_id,
+                                                          picking.picking_type_id.warehouse_id.partner_id),
+                    'reference_no': picking.sale_id.name + '_' + picking.name if picking.sale_id else picking.name,
+                    'details': mp_provider._set_shipment_details(picking)
+                })
 
-            response = mp_provider.call_shipping_remote({
-                'action': 'shipment',
-                'package_type': self.mp_default_package_type_id.shipper_package_code,
-                'consignee': mp_provider._set_consignee(picking.partner_id),
-                'consignor': mp_provider._set_shipper(picking.company_id.partner_id,
-                                                      picking.picking_type_id.warehouse_id.partner_id),
-                'reference_no': picking.sale_id.name if picking.sale_id else picking.name,
-                'details': mp_provider._set_shipment_details(picking)
-            })
+                if response.get('status') == 200:
+                    tracking_number = response['data']['tracking_number']
+                else:
+                    raise UserError(response['msg'])
 
-            if response.get('status') == 200:
-                tracking_number = response['data']['tracking_number']
-            else:
-                raise UserError(response['msg'])
+                if response['data'].get('shipping_message', ''):
+                    picking.message_post(body='Shipping Message for picking {} : {} '
+                                         .format(picking.name, response['data'].get('shipping_message', '')))
 
-            pdf_data = base64.b64decode(response['data']['label'])
+                if response['data'].get('warehouse_message', ''):
+                    picking.message_post(body='Warehouse Sending Message for picking {} : {} '
+                                         .format(picking.name, response['data'].get('warehouse_message', '')))
 
-            mp_labels = [('%s.%s' % (tracking_number, self.mp_label_format),
-                          pdf_data)]
+                if response['data'].get('label', ''):
+                    pdf_data = base64.b64decode(response['data']['label'])
 
-            for pick in lognote_pickings:
-                pick.message_post(body='MP Delivery Documents', attachments=mp_labels)
+                    mp_labels = [('%s.%s' % (tracking_number, self.mp_label_format),
+                                  pdf_data)]
 
-            shipping_data = {
-                'exact_price': 0,
-                'tracking_number': tracking_number,
-            }
+                    picking.message_post(body='MP Delivery Documents', attachments=mp_labels)
 
-            res.append(shipping_data)
+                shipping_data = {
+                    'exact_price': 0,
+                    'tracking_number': tracking_number,
+                }
+
+                res.append(shipping_data)
 
         return res
 
