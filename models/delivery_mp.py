@@ -61,7 +61,7 @@ class Providermp(models.Model):
         super(Providermp, self)._compute_supports_shipping_insurance()
         for carrier in self:
             if carrier.delivery_type == 'mp':
-                carrier.supports_shipping_insurance = True
+                carrier.supports_shipping_insurance = False
 
     def mp_rate_shipment(self, order):
         mp_provider = MPProvider(logging.getLogger(__name__), self.sudo().mp_username, self.sudo().mp_password)
@@ -107,6 +107,11 @@ class Providermp(models.Model):
                 else:
                     raise UserError(response['msg'])
 
+                picking.message_post(body='Shipping to the Logistics Center has been successfully completed {} : {}, '
+                                          'Please proceed to the Logistics Center for the next steps'
+                                     .format(picking.name, tracking_number))
+
+                '''
                 if response['data'].get('shipping_message', ''):
                     picking.message_post(body='Shipping Message for picking {} : {} '
                                          .format(picking.name, response['data'].get('shipping_message', '')))
@@ -122,6 +127,7 @@ class Providermp(models.Model):
                                   pdf_data)]
 
                     picking.message_post(body='MP Delivery Documents', attachments=mp_labels)
+                '''
 
                 shipping_data = {
                     'exact_price': 0,
@@ -133,37 +139,7 @@ class Providermp(models.Model):
         return res
 
     def mp_get_return_label(self, picking, tracking_number=None, origin_date=None):
-        mp_provider = MPProvider(logging.getLogger(__name__), self.sudo().mp_username, self.sudo().mp_password)
-
-        lognote_pickings = picking.sale_id.picking_ids if picking.sale_id else picking
-
-        response = mp_provider.call_shipping_remote({
-            'action': 'shipment',
-            'package_type': self.mp_default_package_type_id.shipper_package_code,
-            'consignor': mp_provider._set_consignee(picking.partner_id),
-            'consignee': mp_provider._set_shipper(picking.company_id.partner_id,
-                                                  picking.picking_type_id.warehouse_id.partner_id),
-            'reference_no': ('RE_%s' % picking.sale_id.name if picking.sale_id else picking.name),
-            'details': mp_provider._set_shipment_details(picking)
-        })
-
-        if response.get('status') == 200:
-            tracking_number = response['data']['tracking_number']
-        else:
-            raise UserError(response['msg'])
-        pdf_data = base64.b64decode(response['data']['label'])
-
-        mp_labels = [('%s.%s' % (tracking_number, self.mp_label_format),
-                      pdf_data)]
-
-        for pick in lognote_pickings:
-            pick.message_post(body='MP Return Documents', attachments=mp_labels)
-
-        shipping_data = {
-            'exact_price': 0,
-            'tracking_number': tracking_number,
-        }
-        return shipping_data
+        return super(Providermp, self).get_return_label(picking, tracking_number, origin_date)
 
     def mp_get_tracking_link(self, picking):
         return 'http://www.dhl.com/en/express/tracking.html?AWB=%s' % picking.carrier_tracking_ref
