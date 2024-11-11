@@ -15,7 +15,7 @@ class MPProvider():
 
     def __init__(self, debug_logger, username, password):
         self.debug_logger = debug_logger
-        # self.url = 'http://localhost:8000/api/odoo/logistics'
+        #self.url = 'http://localhost:8000/api/odoo/logistics'
         self.url = 'http://logistic-center.multipunkt.de/api/odoo/logistics'
         self.headers = {
             'Authorization': 'Basic ' + base64.b64encode((username + ':' + password).encode('utf-8')).decode('utf-8'),
@@ -43,7 +43,8 @@ class MPProvider():
         consignee['CountryCode'] = partner_id.country_id.code
         consignee['CountryName'] = partner_id.country_id.name
         consignee['PersonName'] = partner_id.name
-        consignee['PhoneNumber'] = partner_id.phone
+        if partner_id.phone:
+            consignee['PhoneNumber'] = partner_id.phone
         if partner_id.email:
             consignee['Email'] = partner_id.email
         return consignee
@@ -70,8 +71,8 @@ class MPProvider():
         shipper['CountryCode'] = warehouse_partner_id.country_id.code
         shipper['CountryName'] = warehouse_partner_id.country_id.name
         shipper['PersonName'] = warehouse_partner_id.name
-        shipper['PhoneNumber'] = warehouse_partner_id.phone
-
+        if warehouse_partner_id.phone:
+            shipper['PhoneNumber'] = warehouse_partner_id.phone
         if warehouse_partner_id.email:
             shipper['Email'] = warehouse_partner_id.email
         return shipper
