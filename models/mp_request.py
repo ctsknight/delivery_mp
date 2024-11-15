@@ -119,6 +119,7 @@ class MPProvider():
                     'name': commodity.product_id.name,
                     'quantity': commodity.qty,
                     'code': commodity.product_id.code,
+                    'gtin': commodity.product_id.barcode,
                     'weight': commodity.product_id.weight,
                     'value': commodity.product_id.lst_price,
                 }
