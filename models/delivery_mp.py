@@ -91,6 +91,15 @@ class Providermp(models.Model):
         res = []
         for picking in pickings:
             if picking.sale_id:
+                # Generate a PDF using Odoo's report action
+                result, report_format = self.env['ir.actions.report']._render_qweb_pdf('studio_customization.abholschein_4a016bec-b09d-44ea-897f-abdcc8d1ec1c',
+                                                [picking.id])
+                print('Lieferschein － ' + picking.name + '.pdf')
+
+                # Encode the PDF content in Base64
+                pdf_base64 = base64.b64encode(result)
+
+                print(pdf_base64)
                 response = mp_provider.call_shipping_remote({
                     'action': 'shipment',
                     'warehouse': picking.location_id.warehouse_id.name,
@@ -99,7 +108,9 @@ class Providermp(models.Model):
                     'consignor': mp_provider._set_shipper(picking.company_id.partner_id,
                                                           picking.picking_type_id.warehouse_id.partner_id),
                     'reference_no': picking.sale_id.name + '_' + picking.name if picking.sale_id else picking.name,
-                    'details': mp_provider._set_shipment_details(picking)
+                    'details': mp_provider._set_shipment_details(picking),
+                    'file_base64': pdf_base64.decode('utf-8'),
+                    'file_name': 'Lieferschein － ' + picking.name + '.pdf'
                 })
 
                 if response.get('status') == 200:
