@@ -69,7 +69,7 @@ class DeliveryMPController(http.Controller):
 
             # Validate required fields
             _logger.info("Validating required fields")
-            if not all(key in data for key in ['name', 'origin', 'tracking_numbers', 'shipping_method']):
+            if not all(key in data for key in ['name', 'origin', 'tracking_numbers', 'shipping_method', 'delivery_date']):
                 missing_fields = [field for field in ['name', 'origin', 'tracking_numbers', 'shipping_method'] if field not in data]
                 _logger.warning(f"Missing required fields: {', '.join(missing_fields)}")
                 return request.make_response(json.dumps({
@@ -106,7 +106,11 @@ class DeliveryMPController(http.Controller):
             carrier_update_needed = False
             carrier = None
             shipping_method = data.get('shipping_method')
-            _logger.info(f"Processing shipping method: {shipping_method}")
+            schedule_date = data.get('delivery_date')
+            _logger.info(f"Processing shipping method: {shipping_method}, schedule_date: {schedule_date}")
+
+            if schedule_date:
+                picking.write({'scheduled_date': schedule_date})
 
             if shipping_method:
                 # First, search for a package type with matching shipper_package_code
