@@ -110,7 +110,12 @@ class DeliveryMPController(http.Controller):
             _logger.info(f"Processing shipping method: {shipping_method}, schedule_date: {schedule_date}")
 
             if schedule_date:
-                picking.write({'scheduled_date': schedule_date})
+                _logger.info(f"Attempting to update schedule_date to: {schedule_date}")
+                try:
+                    picking.write({'x_studio_shipment_date': schedule_date})
+                    _logger.info("Successfully updated schedule_date")
+                except Exception as e:
+                    _logger.error(f"Error updating schedule_date: {str(e)}")
 
             if shipping_method:
                 # First, search for a package type with matching shipper_package_code
