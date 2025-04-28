@@ -2,6 +2,8 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 import base64
 
+from docutils.nodes import reference
+
 from .mp_request import MPProvider
 from odoo.tools.zeep.helpers import serialize_object
 
@@ -90,7 +92,7 @@ class Providermp(models.Model):
         mp_provider = MPProvider(logging.getLogger(__name__), self.sudo().mp_username, self.sudo().mp_password)
         res = []
         for picking in pickings:
-            if picking.sale_id:
+            if picking:
                 # Generate a PDF using Odoo's report action
                 result, report_format = self.env['ir.actions.report']._render_qweb_pdf('studio_customization.abholschein_4a016bec-b09d-44ea-897f-abdcc8d1ec1c',
                                                 [picking.id])
@@ -99,7 +101,6 @@ class Providermp(models.Model):
                 # Encode the PDF content in Base64
                 pdf_base64 = base64.b64encode(result)
 
-                print(pdf_base64)
                 response = mp_provider.call_shipping_remote({
                     'action': 'shipment',
                     'warehouse': picking.location_id.warehouse_id.name,
