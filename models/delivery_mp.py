@@ -101,6 +101,14 @@ class Providermp(models.Model):
                 # Encode the PDF content in Base64
                 pdf_base64 = base64.b64encode(result)
 
+                result_picking_list, report_format = self.env['ir.actions.report']._render_qweb_pdf('stock.report_picking',
+                                                [picking.id])
+                print('Picking_List － ' + picking.name + '.pdf')
+
+                # Encode the PDF content in Base64
+                pdf_base64_picking_list = base64.b64encode(result_picking_list)
+
+
                 response = mp_provider.call_shipping_remote({
                     'action': 'shipment',
                     'warehouse': picking.location_id.warehouse_id.name,
@@ -111,7 +119,9 @@ class Providermp(models.Model):
                     'reference_no': picking.sale_id.name + '_' + picking.name if picking.sale_id else picking.name,
                     'details': mp_provider._set_shipment_details(picking),
                     'file_base64': pdf_base64.decode('utf-8'),
-                    'file_name': 'Lieferschein － ' + picking.name + '.pdf'
+                    'file_name': 'Lieferschein － ' + picking.name + '.pdf',
+                    'file_base64_picking_list': pdf_base64_picking_list.decode('utf-8'),
+                    'file_name_picking_list': 'Picking_List － ' + picking.name + '.pdf'
                 })
 
                 if response.get('status') == 200:
